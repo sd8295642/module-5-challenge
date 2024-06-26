@@ -1,60 +1,79 @@
 // Retrieve tasks and nextId from localStorage
-let taskList = JSON.parse(localStorage.getItem("tasks"));
 let nextId = JSON.parse(localStorage.getItem("nextId"));
 
-const taskTitle = document.querySelector('#task-title');
-const taskDueDate = document.querySelector('#datepicker');
-const taskDescription = document.querySelector('#task-description');
-const addTaskBtn = document.querySelector('#add-task');
+const taskTitle = $('#task-title');
+const taskDueDate = $('#datepicker');
+const taskDescription = $('#task-description');
+const addTaskBtn = $('#add-task');
 
 // Todo: create a function to generate a unique task id
 function generateTaskId() {
     const taskId = {
-        title: taskTitle.value.trim(),
-        date: taskDueDate.value.trim(),
-        description: taskDescription.value.trim(),
+        title: taskTitle.val(),
+        date: taskDueDate.val(),
+        description: taskDescription.val().trim(),
      };
-     localStorage.setItem('taskId', JSON.stringify(taskId));
-   
-    // if (nextId === null){
-    //     nextId = 1;
-    // }
-    // else {
-    //     nextId++;
-    // }
+
+     let taskList = JSON.parse(localStorage.getItem("taskId"));
+     if (taskList){
+        taskList.push(taskId);
+     }
+     else {
+        taskList = [taskId];
+     }
+    
+     console.log('added array item', taskList);
+
+     localStorage.setItem('taskId', JSON.stringify(taskList));
+}
+
+// Todo: create a function to handle deleting a task
+function handleDeleteTask(event){
+    htmlCard.remove();
 }
 
 // Todo: create a function to create a task card
 function createTaskCard(task) {
     const taskData = `
-    <div class="card" style="width: 18rem;">
+    <style>
+    .draggable { width: 90px; height: 80px; padding: 5px; float: left; margin: 0 10px 10px 0; font-size: .9em; }
+    .ui-widget-header p, .ui-widget-content p { margin: 0; }
+    </style>
+
+    <div id="draggable5" class="draggable ui-widget-content card" style="width: 18rem;">
     <div class="card-body">
-      <h5 class="card-title">${taskTitle.value}</h5>
-      <p class="card-date">${taskDueDate.value}</p>
-      <p class="card-text">${taskDescription.value}</p>
+      <h5 class="card-title">${taskTitle.val()}</h5>
+      <p class="card-date">${taskDueDate.val()}</p>
+      <p class="card-text">${taskDescription.val()}</p>
       <button onclick="handleDeleteTask()">Delete</button>
     </div>
   </div>
+ 
+  <script>
+    $( function() {
+        $( "#draggable5" ).draggable({ grid: [ 80, 80 ] });
+    } );
+  </script>
     `;
     const htmlCard = $('<section>');
     htmlCard.html(taskData);
     $('#todo-cards').append(htmlCard);
 };
 
-addTaskBtn.addEventListener('click', function(event) {
+addTaskBtn.on('click', function(event) {
     event.preventDefault();
     generateTaskId();
     createTaskCard();
 
-    taskTitle.value = "";
-    taskDueDate.value = "";
-    taskDescription.value = "";
+    taskTitle.val() = "";
+    taskDueDate.val() = "";
+    taskDescription.val() = "";
 });
 
 
 // Todo: create a function to render the task list and make cards draggable
 function renderTaskList() {
-
+   
 }
 
 // Todo: create a function to handle adding a new task
@@ -73,11 +92,6 @@ function handleAddTask(){
     // $('#datepicker').val(""); 
     // $('description').val("");
 };
-
-// Todo: create a function to handle deleting a task
-function handleDeleteTask(event){
-    task.remove();
-}
 
 // Todo: create a function to handle dropping a task into a new status lane
 function handleDrop(event, ui) {
